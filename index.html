@@ -524,7 +524,8 @@ function detective(){
       <div class="actions"><div class="row"><button class="btn ghost" id="no">${esc(t('almost'))}</button><button class="btn gold" id="yes">${esc(t('yes'))}</button></div>
       <button class="skip" id="sk">${esc(t('skip'))}</button></div>`,
     ()=>{ sfx('flip');
-      const done=ok=>{ toast(ok?t('yesMsg'):t('almostMsg')); addLight(false,$('#card')); i++; turn++;
+      /* solo «¡Lo notaste!» suma luz; «Casi» no suma (un toque suave, sin destello) */
+      const done=ok=>{ toast(ok?t('yesMsg'):t('almostMsg')); if(ok) addLight(false,$('#card')); else sfx('tick'); i++; turn++;
         setTimeout(()=>{ if(turn>=N) recuerdo(); else passScreen(card); }, 950); };
       $('#yes').onclick=()=>done(true); $('#no').onclick=()=>done(false);
       $('#sk').onclick=()=>{ i++; toast(t('skipMsg')); card(); };
