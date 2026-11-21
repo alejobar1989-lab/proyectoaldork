@@ -40,7 +40,14 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .mj img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
   filter:drop-shadow(0 0 calc(2px + 14px*var(--mg)) rgba(255,185,85,calc(.1 + .8*var(--mg)))) sepia(calc(.75*var(--mg))) saturate(calc(1 + 2.2*var(--mg))) brightness(calc(.95 + .3*var(--mg)))}
 .mini b{color:var(--gold);font-weight:700;font-size:15px}
-.tbtn{font-size:14px;min-height:44px;min-width:44px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted)}
+.tbtn{font-size:14px;min-height:44px;min-width:44px;padding:8px 14px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+  border:1px solid rgba(242,196,107,.28);color:var(--cream);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;transition:transform .12s,border-color .3s}
+.tbtn:active{transform:scale(.94)}
+#snd{padding:0;width:44px;color:var(--gold)}
+#snd svg{width:22px;height:22px;overflow:visible}
+#snd .w1{animation:wv 2.4s ease-in-out infinite}#snd .w2{animation:wv 2.4s ease-in-out .35s infinite}
+@keyframes wv{50%{opacity:.35}}
+#snd.off{color:var(--muted);border-color:rgba(255,255,255,.14)}
 .tbtns{display:flex;gap:8px}
 #view{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:0;position:relative}
 .fade{animation:fade .45s ease both}
@@ -147,7 +154,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:30px;line-height:1.15;marg
 <div id="app">
   <div class="top">
     <div class="mini" id="mini"><div class="mj" id="mj"><canvas id="mjc"></canvas><img src="img/frasco-apagado.webp" alt=""></div><b id="count">0</b><span id="countLbl"></span></div>
-    <div class="tbtns"><button class="tbtn" id="snd" aria-label="sonido">🔈</button><button class="tbtn" id="lang"></button></div>
+    <div class="tbtns"><button class="tbtn" id="snd" aria-label="Sonido"></button><button class="tbtn" id="lang"></button></div>
   </div>
   <div id="view"></div>
 </div>
@@ -260,6 +267,7 @@ function jarPath(g,W,H){ const P=(x,y)=>[x*W,y*H]; g.beginPath(); g.moveTo(...P(
   g.quadraticCurveTo(...P(.742,.300),...P(.681,.283)); g.lineTo(...P(.681,.17)); g.closePath(); }
 const BOX={x0:.29,x1:.71,y0:.40,y1:.845};
 const MOUTH={x:.5,y:.176};
+const RIM={x:.5,y:.183,rx:.214,ry:.021}; /* borde de vidrio de la boca (img/frasco-abierto.webp) */
 const PAD=.25; /* los canvas sobresalen 25 % por lado: así las luces llegan desde afuera y las chispas salen */
 function mountJars(){
   view.querySelectorAll('.jarbox[data-n]').forEach(box=>{
@@ -274,7 +282,7 @@ function mountJars(){
     size(); window.addEventListener('resize',size);
     const rand=(a,b)=>a+Math.random()*(b-a);
     const inside=()=>({x:rand(BOX.x0+.02,BOX.x1-.02), y:rand(BOX.y0+.02,BOX.y1-.02)});
-    const flies=[], sparks=[], ripples=[], motes=[];
+    const flies=[], sparks=[], glints=[], motes=[]; let rimGlow=0;
     const maxN=Math.min(90, Math.max(target*3, target?8:0));
     const newFly=(x,y,mode)=>({x,y,vx:0,vy:0,ph:rand(0,6.28),sp:rand(.5,1.6),r:rand(.03,.062),spr:SPRS[Math.floor(Math.random()*SPRS.length)],trail:[],mode:mode||'in',a:1});
     const spawnInside=()=>{ const p=inside(); flies.push(newFly(p.x,p.y)); };
@@ -296,7 +304,7 @@ function mountJars(){
     const openLid=cb=>{ lidState='opening';
       /* primero tiembla el frasco entero, con su tapa original; la tapa suelta aparece justo en el "pop" */
       jc.animate([{transform:'none'},{transform:'rotate(-2deg)'},{transform:'rotate(2deg)'},{transform:'rotate(-1.5deg) translateY(-1%)'},{transform:'rotate(1deg)'},{transform:'none'}],{duration:600,easing:'ease-in-out'}).onfinish=()=>{
-        setOpen(true); sfx('pop'); flash=Math.max(flash,.45); burst(MOUTH.x,MOUTH.y-.02,18,true,.45); ripples.push({x:MOUTH.x,y:MOUTH.y,r:.06,a:.9});
+        setOpen(true); sfx('pop'); flash=Math.max(flash,.45); burst(MOUTH.x,MOUTH.y-.02,18,true,.45); rimGlow=1;
         const a=lid.animate([{transform:'none'},{transform:'translate(-8%,-100%) rotate(-10deg)',offset:.55},{transform:'translate(-30%,-125%) rotate(-22deg)'}],{duration:900,easing:'cubic-bezier(.2,.9,.3,1)',fill:'forwards'});
         a.onfinish=()=>{ lidState='open'; lidW.classList.add('float'); if(cb) cb(); }; };
     };
@@ -336,9 +344,12 @@ function mountJars(){
         gi.globalAlpha=(.12+.38*glow)*(.5+.5*Math.sin(t*2+m.ph)); gi.beginPath(); gi.arc(m.x*W,m.y*H,.8+glow*.6,0,7); gi.fill(); }
       for(let i=flies.length-1;i>=0;i--){ const f=flies[i];
         if(f.mode==='arrive'){ f.k=Math.min(1,f.k+f.spd*dt); const k=f.k, a=(1-k)*(1-k), b=2*(1-k)*k, c=k*k;
-          f.x=a*f.p0.x+b*f.p1.x+c*f.p2.x; f.y=a*f.p0.y+b*f.p1.y+c*f.p2.y; if(k>=1){ f.mode='dive'; f.vy=.004; f.tx=rand(.4,.6); } }
+          f.x=a*f.p0.x+b*f.p1.x+c*f.p2.x; f.y=a*f.p0.y+b*f.p1.y+c*f.p2.y; if(k>=1){ f.mode='dive'; f.vy=.004; f.brush=Math.random()<.35; f.tx=f.brush?.5+(Math.random()<.5?-1:1)*rand(.13,.155):rand(.4,.6); } }
         else if(f.mode==='dive'){ f.vy+=.0007*dt; f.y+=f.vy*dt; f.x+=(f.tx-f.x)*.06*dt;
-          if(!f.crossed && f.y>MOUTH.y){ f.crossed=true; ripples.push({x:MOUTH.x,y:MOUTH.y+.004,r:.04,a:.8}); }
+          if(!f.crossed && f.y>RIM.y-.01){ f.crossed=true; rimGlow=Math.min(1,rimGlow+.35); glints.push({x:f.x,a:1});
+            /* algunas rozan el borde: el vidrio se ilumina y saltan chispitas hacia afuera */
+            if(f.brush){ const sd=f.x<.5?-1:1; for(let j=0;j<4;j++) sparks.push({x:f.x,y:RIM.y,vx:sd*rand(.0015,.005),vy:-rand(.002,.0065),life:1,decay:rand(.03,.05),r:rand(.01,.018),spr:SPRS[2]});
+              glints.push({x:f.x,a:1.3}); f.tx=rand(.42,.58); } }
           if(f.y>.36){ f.mode='in'; f.vy*=.35; const p=inside(); f.tx=p.x; f.ty=p.y;
             if(intro){ const l=Math.min(target,Math.round(flies.filter(q=>q.mode==='in').length/perLight));
               if(l>lit){ lit=l; flash=Math.max(flash,.3); if(counter){ counter.textContent=lit; counter.animate([{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:300}); } chimeN(lit); } } } }
@@ -364,10 +375,21 @@ function mountJars(){
         } else drawFly(go,f,blink,f.a);
       }
       gi.restore();
-      /* ---- capa exterior: ondas en la boca y chispas ---- */
-      go.strokeStyle='rgba(255,215,140,1)';
-      for(let i=ripples.length-1;i>=0;i--){ const p=ripples[i]; p.r+=.004*dt; p.a-=.035*dt; if(p.a<=0){ ripples.splice(i,1); continue; }
-        go.globalAlpha=p.a*.7; go.lineWidth=1.6; go.beginPath(); go.ellipse(p.x*W,p.y*H,Math.min(.19,p.r)*W,Math.min(.19,p.r)*W*.13,0,0,7); go.stroke(); }
+      /* ---- capa exterior: luz en la boca del frasco y chispas ---- */
+      const floor=(lidState==='open'||lidState==='opening')?.1+.25*glow:0; const rg=Math.max(rimGlow,floor);
+      if(rg>.01){
+        /* resplandor que sale de la boca abierta */
+        go.save(); go.translate(RIM.x*W,RIM.y*H); go.scale(1,.22); go.globalAlpha=.5*rg; const R0=RIM.rx*1.25*W; go.drawImage(SPR,-R0,-R0,R0*2,R0*2); go.restore();
+        /* el borde de vidrio se enciende */
+        go.save(); go.beginPath(); go.ellipse(RIM.x*W,RIM.y*H,RIM.rx*W,RIM.ry*W,0,0,7);
+        go.strokeStyle='rgba(255,180,80,1)'; go.globalAlpha=.28*rg; go.lineWidth=5+5*rg; go.stroke();   /* halo ancho */
+        go.strokeStyle='rgba(255,232,180,1)'; go.globalAlpha=.8*rg; go.lineWidth=1.2+1*rg; go.stroke();  /* filo brillante */
+        go.restore();
+      }
+      /* destellos donde cada luz cruzó el borde */
+      for(let i=glints.length-1;i>=0;i--){ const q=glints[i]; q.a-=.035*dt; if(q.a<=0){ glints.splice(i,1); continue; }
+        const gx=q.x*W, gy=(RIM.y*W+RIM.ry*W*.85); go.save(); go.translate(gx,gy); go.scale(2.4,.45); go.globalAlpha=Math.min(1,q.a); const R1=.035*W; go.drawImage(SPRS[2],-R1,-R1,R1*2,R1*2); go.restore(); }
+      rimGlow*=Math.pow(.955,dt);
       for(let i=sparks.length-1;i>=0;i--){ const s=sparks[i]; s.x+=s.vx*dt; s.y+=s.vy*dt; s.vy-=.00012*dt; s.vx*=Math.pow(.985,dt); s.life-=s.decay*dt;
         if(s.life<=0){ sparks.splice(i,1); continue; } const rr=s.r*W*(.5+s.life*.7); go.globalAlpha=s.life; go.drawImage(s.spr,s.x*W-rr,s.y*H-rr,rr*2,rr*2); }
       scatter*=Math.pow(.9,dt); flash*=Math.pow(.94,dt);
@@ -406,7 +428,9 @@ function chimeN(n){ if(!soundOn) return; const keep=S.lights; S.lights=n; chime(
 /* ---------- barra superior ---------- */
 function bar(){
   $('#count').textContent=S.lights; $('#countLbl').textContent=t('lights');
-  $('#lang').textContent=t('langBtn'); $('#snd').textContent=soundOn?'🔈':'🔇';
+  $('#lang').textContent=t('langBtn'); const sp='<path d="M3.5 9.3h3.3L11.6 5v14l-4.8-4.3H3.5z" fill="currentColor" fill-opacity=".22"/>';
+  $('#snd').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+sp+(soundOn?'<path class="w1" d="M15 9.3a4 4 0 0 1 0 5.4"/><path class="w2" d="M17.6 6.6a7.6 7.6 0 0 1 0 10.8"/>':'<path d="M15.5 9.5l5 5M20.5 9.5l-5 5" opacity=".8"/>')+'</svg>';
+  $('#snd').classList.toggle('off',!soundOn); $('#snd').setAttribute('aria-label',soundOn?(L==='es'?'Silenciar':'Mute'):(L==='es'?'Activar sonido':'Sound on'));
   document.documentElement.lang=L;
 }
 $('#lang').onclick=()=>{ L=L==='es'?'en':'es'; try{localStorage.setItem('ln_lang',L)}catch(e){} bar(); redraw(); };
