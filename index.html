@@ -127,7 +127,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:30px;line-height:1.15;marg
 .dot{position:absolute;z-index:2;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,#fff6d6 0,#ffd27a 35%,rgba(255,170,60,0) 72%);
   box-shadow:0 0 14px 5px rgba(255,190,90,.55);animation:twinkle 3s ease-in-out infinite;pointer-events:none;mix-blend-mode:screen}
 @keyframes twinkle{50%{opacity:.55;transform:translateY(-4px) scale(.85)}}
-.fly{position:fixed;z-index:50;width:22px;height:22px;border-radius:50%;pointer-events:none;
+.fly{position:fixed;left:0;top:0;z-index:50;width:22px;height:22px;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,#fff 0,#ffd27a 35%,rgba(255,170,60,0) 72%);box-shadow:0 0 24px 10px rgba(255,190,90,.7)}
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);transform:translateX(-50%);max-width:calc(100% - 40px);text-align:center;background:rgba(20,16,40,.92);
   border:1px solid rgba(242,196,107,.35);padding:12px 18px;border-radius:14px;font-size:16px;z-index:60;animation:fade .3s ease both}
@@ -149,6 +149,9 @@ h2{font-family:var(--serif);font-weight:700;font-size:30px;line-height:1.15;marg
 .opt.wrong{opacity:.4}
 .small{font-size:15px;color:var(--muted)}
 @media (max-height:700px){h1{font-size:36px}h2{font-size:25px}.lead{font-size:16px}.bigcount{font-size:42px}.hero{width:min(50vw,190px)}.btn{padding:14px 16px}.actions{gap:8px;padding-top:8px}.card{padding:20px 18px}.card .q{font-size:23px}.why{margin-top:6px}}
+.name{width:100%;max-width:320px;margin-top:12px;padding:15px 16px;border-radius:16px;border:1px solid rgba(242,196,107,.35);background:rgba(255,255,255,.07);color:var(--cream);font:500 17px var(--sans);text-align:center;outline:none}
+.name:focus{border-color:var(--gold)}
+.name::placeholder{color:var(--muted)}
 .home-pending{width:100%;background:rgba(242,196,107,.1);border:1px solid rgba(242,196,107,.35);border-radius:18px;padding:14px;margin-top:12px;font-size:15px}
 </style>
 </head>
@@ -307,11 +310,11 @@ function mountJars(){
       /* primero tiembla el frasco entero, con su tapa original; la tapa suelta aparece justo en el "pop" */
       jc.animate([{transform:'none'},{transform:'rotate(-2deg)'},{transform:'rotate(2deg)'},{transform:'rotate(-1.5deg) translateY(-1%)'},{transform:'rotate(1deg)'},{transform:'none'}],{duration:600,easing:'ease-in-out'}).onfinish=()=>{
         setOpen(true); sfx('pop'); flash=Math.max(flash,.45); burst(MOUTH.x,MOUTH.y-.02,18,true,.45); rimGlow=1;
-        const a=lid.animate([{transform:'none'},{transform:'translate(-8%,-100%) rotate(-10deg)',offset:.55},{transform:'translate(-30%,-125%) rotate(-22deg)'}],{duration:900,easing:'cubic-bezier(.2,.9,.3,1)',fill:'forwards'});
+        const a=lid.animate([{transform:'none'},{transform:'translate(25%,-80%) rotate(10deg)',offset:.55},{transform:'translate(82%,-30%) rotate(24deg)'}],{duration:900,easing:'cubic-bezier(.2,.9,.3,1)',fill:'forwards'});
         a.onfinish=()=>{ lidState='open'; lidW.classList.add('float'); if(cb) cb(); }; };
     };
     const closeLid=cb=>{ lidState='closing'; lidW.classList.remove('float');
-      const a=lid.animate([{transform:'translate(-30%,-125%) rotate(-22deg)'},{transform:'translate(-4%,-45%) rotate(-6deg)',offset:.6},{transform:'translate(0,-5%) rotate(0deg)',offset:.86},{transform:'none'}],{duration:720,easing:'cubic-bezier(.55,0,.4,1)',fill:'forwards'});
+      const a=lid.animate([{transform:'translate(82%,-30%) rotate(24deg)'},{transform:'translate(25%,-60%) rotate(8deg)',offset:.6},{transform:'translate(0,-5%) rotate(0deg)',offset:.86},{transform:'none'}],{duration:720,easing:'cubic-bezier(.55,0,.4,1)',fill:'forwards'});
       a.onfinish=()=>{ sfx('tock'); setOpen(false); lidState='closed'; requestAnimationFrame(()=>a.cancel()); if(cb) cb(); };
     };
     const finish=()=>closeLid(()=>{ bloomed=true; flash=1; burst(.5,.42,46,true,.55); burst(.5,.62,18,false); box.classList.add('pop'); sfx('bloom');
@@ -551,7 +554,7 @@ function recuerdo(){
 
 /* ---------- ronda 3: la fórmula ---------- */
 function formula(){
-  let turn=0;
+  let turn=0, who=0; /* who: 0 = quien empezó, 1 = su pareja (cambia cada vez que se pasan el teléfono) */
   const step1=()=>screen(()=>{
     const opts=shuffle(C.graciasPor).slice(0,5);
     show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%">
@@ -582,7 +585,7 @@ function formula(){
     show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%">
       <div class="eyebrow">${esc(t('f3'))}</div>
       <div class="card" style="margin-top:14px"><div class="phrase" style="color:var(--ink)">${esc(t('f1').replace('…',''))} <em style="color:#b0743a">${esc(porTxt.replace(/\.$/,''))}</em>.<br>${esc(t('f2').replace('…',''))} <em style="color:#b0743a">${esc(cualTxt)}</em>.</div></div></div>
-      <div class="actions"><button class="btn" id="go">${esc(t('look10'))}</button></div>`,
+      <div class="actions"><button class="btn" id="go">${esc(t('lookGo'))}</button></div>`,
     ()=>{ $('#go').onclick=()=>look(por,cual); });
   });
   /* 10 segundos SIN cronómetro: dos luces (una por cada quien) se buscan despacio y al final se juntan en una sola.
@@ -591,14 +594,14 @@ function formula(){
     show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
       <h2>${esc(t('look10'))}</h2>
       <div class="meet"><canvas id="meet"></canvas></div>
-      <p class="lead">${esc(t('hug'))}</p></div>
+      <p class="small" style="margin:0 0 6px">${esc(t('lookWait'))}</p><p class="lead">${esc(t('hug'))}</p></div>
       <div class="actions"><button class="skip" id="sk">${esc(t('skip'))}</button></div>`,
     ()=>{
       const cv=$('#meet'), g=cv.getContext('2d'), dpr=Math.min(2,window.devicePixelRatio||1);
       const Wc=cv.clientWidth, Hc=cv.clientHeight; cv.width=Wc*dpr; cv.height=Hc*dpr;
       const T=10000; let t0=null, merged=0, stop=false; const trail=[[],[]], motes=[];
       const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
-      const fin=()=>{ if(por||cual){ S.gracias.push({por:por||null,cual:cual||null}); save(); }
+      const fin=()=>{ if(por||cual){ S.gracias.push({por:por||null,cual:cual||null,who}); save(); }
         sfx('done10'); try{ navigator.vibrate && navigator.vibrate([30,50,30]); }catch(e){}
         addLight(true,cv,true); toast(t('oneMore')); setTimeout(()=>{ stop=true; nextTurn(); },1600); };
       const frame=now=>{
@@ -633,11 +636,11 @@ function formula(){
       $('#sk').onclick=()=>{ stop=true; nextTurn(); };
     });
   });
-  const nextTurn=()=>{ turn++; if(turn<2) passScreen(step1); else afterFormula(); };
+  const nextTurn=()=>{ turn++; if(turn<2){ who^=1; passScreen(step1); } else afterFormula(); };
   const afterFormula=()=>screen(()=>show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
       ${jarHTML(S.lights)}<p class="lead">${esc(t('oneMore'))}</p></div>
       <div class="actions"><button class="btn" id="go">${esc(t('nextRound'))}</button><button class="btn ghost" id="more">${esc(t('anotherThanks'))}</button></div>`,
-    ()=>{ $('#go').onclick=secretRound; $('#more').onclick=()=>{ turn=1; passScreen(step1); }; }));
+    ()=>{ $('#go').onclick=secretRound; $('#more').onclick=()=>{ turn=1; who^=1; passScreen(step1); }; }));
   roundIntro('r3','gracias',1,()=>passScreen(step1));
 }
 
@@ -688,7 +691,7 @@ async function makeCard(){
   const lv=Math.max(.4,Math.min(1,S.lights/14));
   let gr=g.createLinearGradient(0,0,0,H); gr.addColorStop(0,'#2b1e47'); gr.addColorStop(.45,'#1a1636'); gr.addColorStop(1,'#120f26'); g.fillStyle=gr; g.fillRect(0,0,W,H);
   g.fillStyle='#fff3d6'; for(let i=0;i<110;i++){ g.globalAlpha=.15+R()*.55; g.beginPath(); g.arc(R()*W,R()*600,.4+R()*1.6,0,7); g.fill(); } g.globalAlpha=1;
-  const JS=500, JX=(W-JS)/2, JY=28;
+  const JS=420, JX=(W-JS)/2, JY=22;
   gr=g.createRadialGradient(W/2,JY+JS*.6,0,W/2,JY+JS*.6,540); gr.addColorStop(0,`rgba(255,175,85,${.45*lv})`); gr.addColorStop(.5,`rgba(255,140,60,${.15*lv})`); gr.addColorStop(1,'rgba(255,140,60,0)'); g.fillStyle=gr; g.fillRect(0,0,W,H);
   /* luz y luciérnagas dentro del vidrio */
   g.save(); g.translate(JX,JY); jarPath(g,JS,JS); g.clip(); g.globalCompositeOperation='lighter';
@@ -708,33 +711,42 @@ async function makeCard(){
   for(let i=0;i<16;i++){ const a=R()*6.28, rr=JS*(.38+R()*.2), x=W/2+Math.cos(a)*rr, y=JY+JS*.55+Math.sin(a)*rr*.8, r=4+R()*9; g.globalAlpha=.45+R()*.45; g.drawImage(SPRS[2],x-r,y-r,r*2,r*2); }
   g.globalAlpha=1; g.globalCompositeOperation='source-over';
   g.textAlign='center'; g.font='700 30px "DM Sans", sans-serif'; g.fillStyle='#f2c46b'; try{ g.letterSpacing='5px'; }catch(e){}
-  g.fillText(`✦  ${S.lights} ${t('lights').toUpperCase()}  ✦`, W/2, JY+JS+22); try{ g.letterSpacing='0px'; }catch(e){}
+  g.fillText(`✦  ${S.lights} ${t('lights').toUpperCase()}  ✦`, W/2, JY+JS+18); try{ g.letterSpacing='0px'; }catch(e){}
   /* nota de papel */
-  const PX=80, PY=JY+JS+58, PW=W-160, PH=H-PY-104;
+  const PX=70, PY=JY+JS+50, PW=W-140, PH=H-PY-96;
   g.save(); g.shadowColor='rgba(0,0,0,.45)'; g.shadowBlur=40; g.shadowOffsetY=16; rrect(g,PX,PY,PW,PH,34);
   gr=g.createLinearGradient(0,PY,0,PY+PH); gr.addColorStop(0,'#fcf5e8'); gr.addColorStop(1,'#f1e1c6'); g.fillStyle=gr; g.fill(); g.restore();
   rrect(g,PX+14,PY+14,PW-28,PH-28,24); g.strokeStyle='rgba(201,150,70,.55)'; g.lineWidth=2; g.stroke();
-  const items=S.gracias.slice(-3), close=C.tarjeta[1+rnd(3)][L];
+  const N=S.names&&S.names[0]&&S.names[1]?S.names:null;
+  const side=(g,i)=>(g.who===0||g.who===1)?g.who:i%2;
+  const groups=[0,1].map(w=>S.gracias.filter((g,i)=>side(g,i)===w && (g.por||g.cual)).slice(-2));
+  const heads=N?[t('cardFrom').replace('{a}',N[0]).replace('{b}',N[1]), t('cardFrom').replace('{a}',N[1]).replace('{b}',N[0])]:[t('cardGiven'),t('cardReturned')];
+  const close=t('cardKeep'+(1+rnd(3)));
   const date=new Date().toLocaleDateString(L==='es'?'es-ES':'en-US',{day:'numeric',month:'long',year:'numeric'});
   const cx=W/2, mw=PW-110;
   const lines=(txt)=>{ const out=[]; let line=''; for(const w of txt.split(' ')){ const tst=line?line+' '+w:w; if(g.measureText(tst).width>mw&&line){ out.push(line); line=w; } else line=tst; } out.push(line); return out; };
-  const lay=(sc,draw)=>{ let y=PY+96*sc;
-    const put=(txt,font,color,lh)=>{ g.font=font; g.fillStyle=color; for(const l of lines(txt)){ if(draw) g.fillText(l,cx,y); y+=lh; } };
-    put(C.tarjeta[0][L],`700 ${Math.round(58*sc)}px Fraunces, Georgia, serif`,'#2b2135',0); y+=40*sc;
-    if(draw){ g.strokeStyle='rgba(176,116,58,.55)'; g.lineWidth=2; g.beginPath(); g.moveTo(cx-130,y); g.lineTo(cx-24,y); g.moveTo(cx+24,y); g.lineTo(cx+130,y); g.stroke();
-      g.save(); g.translate(cx,y); g.rotate(Math.PI/4); g.fillStyle='#d39a45'; g.fillRect(-7,-7,14,14); g.restore(); }
-    y+=72*sc;
-    for(const it of items){
-      const por=it.por?it.por[L].replace(/\.$/,''):'';
-      if(por) put(t('thanksFor')+' '+por+'.',`500 ${Math.round(42*sc)}px Fraunces, Georgia, serif`,'#2b2135',54*sc);
-      if(it.cual) put(t('youAre')+' '+it.cual[L]+'.',`700 ${Math.round(48*sc)}px Fraunces, Georgia, serif`,'#a4502f',60*sc);
-      y+=30*sc;
-    }
-    y+=items.length?8*sc:24*sc;
-    put(close,`italic 500 ${Math.round(38*sc)}px Fraunces, Georgia, serif`,'#6a5470',50*sc);
+  const orn=(y,wd)=>{ g.strokeStyle='rgba(176,116,58,.5)'; g.lineWidth=2; g.beginPath(); g.moveTo(cx-wd,y); g.lineTo(cx-22,y); g.moveTo(cx+22,y); g.lineTo(cx+wd,y); g.stroke();
+    g.save(); g.translate(cx,y); g.rotate(Math.PI/4); g.fillStyle='#d39a45'; g.fillRect(-6,-6,12,12); g.restore(); };
+  const lay=(sc,draw)=>{ let y=PY+92*sc;
+    const put=(txt,font,color,lh,ls)=>{ g.font=font; g.fillStyle=color; try{ g.letterSpacing=ls||'0px'; }catch(e){} for(const l of lines(txt)){ if(draw) g.fillText(l,cx,y); y+=lh; } try{ g.letterSpacing='0px'; }catch(e){} };
+    put(t('cardUs'),`700 ${Math.round(56*sc)}px Fraunces, Georgia, serif`,'#2b2135',0); y+=38*sc;
+    if(draw) orn(y,140); y+=70*sc;
+    let first=true;
+    groups.forEach((items,w)=>{ if(!items.length) return;
+      if(!first){ y+=4*sc; if(draw) orn(y-18*sc,70); y+=40*sc; } first=false;
+      put(heads[w].toUpperCase(),`700 ${Math.round(29*sc)}px "DM Sans", sans-serif`,'#b0743a',52*sc,'4px');
+      for(const it of items){
+        const por=it.por?it.por[L].replace(/\.$/,''):'';
+        if(por) put(t('thanksFor')+' '+por+'.',`500 ${Math.round(40*sc)}px Fraunces, Georgia, serif`,'#2b2135',52*sc);
+        if(it.cual) put(t('youAre')+' '+it.cual[L]+'.',`700 ${Math.round(46*sc)}px Fraunces, Georgia, serif`,'#a4502f',58*sc);
+        y+=18*sc;
+      }
+    });
+    y+=first?10*sc:22*sc;
+    put(close,`italic 500 ${Math.round(37*sc)}px Fraunces, Georgia, serif`,'#6a5470',48*sc);
     return y;
   };
-  let sc=1; while(sc>.6 && lay(sc,false)>PY+PH-70) sc-=.04;
+  let sc=1.25; while(sc>.6 && lay(sc,false)>PY+PH-70) sc-=.03;
   lay(sc,true);
   g.font='500 24px "DM Sans", sans-serif'; g.fillStyle='rgba(120,90,60,.75)'; g.fillText(date, cx, PY+PH-40);
   g.font='500 26px "DM Sans", sans-serif'; g.fillStyle='rgba(242,196,107,.85)'; g.fillText(t('cardFoot'), cx, H-46);
@@ -744,17 +756,28 @@ function finale(){
   screen(()=>show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
     ${jarHTML(S.lights,{intro:true,counter:'bc',style:'width:min(78vw,320px,40vh,calc(100vh - 395px))'})}<div class="bigcount"><span id="bc" style="display:inline-block">0</span> <span class="small" style="font-family:var(--sans);text-shadow:none">${esc(t('lights'))}</span></div><h2>${esc(t('finalMain'))}</h2><p class="lead">${esc(t('comeBack'))}</p>
     <button class="why" id="w">${esc(t('why'))}</button></div>
-    <div class="actions"><button class="btn gold" id="card">${esc(C.tarjeta[0][L])} ✨</button><button class="skip" id="home">${esc(t('close'))}</button></div>`,
+    <div class="actions"><button class="btn gold" id="card">${esc(t('cardBtn'))}</button><button class="skip" id="home">${esc(t('close'))}</button></div>`,
   ()=>{ $('#w').onclick=()=>why(4); $('#card').onclick=cardScreen; $('#home').onclick=home; }));
 }
+function namesScreen(){
+  screen(()=>show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%">
+    <img class="icon sm" src="img/gracias.webp" alt=""><h2>${esc(t('namesQ'))}</h2>
+    <input class="name" id="na" maxlength="16" autocomplete="off" placeholder="${esc(t('nameA'))}">
+    <input class="name" id="nb" maxlength="16" autocomplete="off" placeholder="${esc(t('nameB'))}"></div>
+    <div class="actions"><button class="btn gold" id="mk">${esc(t('makeCardBtn'))}</button><button class="skip" id="nn">${esc(t('noNames'))}</button></div>`,
+  ()=>{ const go=n=>{ S.names=n; save(); cardScreen(); };
+    $('#mk').onclick=()=>{ const a=$('#na').value.trim(), b=$('#nb').value.trim(); go(a&&b?[a,b]:null); };
+    $('#nn').onclick=()=>go(null); }));
+}
 async function cardScreen(){
+  if(S.names===undefined && S.gracias.length) return namesScreen();
   let blob=null; try{ blob=await makeCard(true); }catch(e){ try{ blob=await makeCard(false); }catch(e2){} } if(!blob){ return; }
-  const url=URL.createObjectURL(blob); const file=new File([blob],'lo-que-note-de-ti.png',{type:'image/png'});
+  const url=URL.createObjectURL(blob); const file=new File([blob],'lo-que-nos-notamos.png',{type:'image/png'});
   const canShare = navigator.canShare && navigator.canShare({files:[file]});
   screen(()=>show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
     <img class="cardimg" src="${url}" alt=""></div>
     <div class="actions">${canShare?`<button class="btn gold" id="sh">${esc(t('share'))}</button>`:''}
-    <a class="btn ${canShare?'ghost':'gold'}" id="dl" href="${url}" download="lo-que-note-de-ti.png" style="text-decoration:none;display:block">${esc(t('saveCard'))}</a>
+    <a class="btn ${canShare?'ghost':'gold'}" id="dl" href="${url}" download="lo-que-nos-notamos.png" style="text-decoration:none;display:block">${esc(t('saveCard'))}</a>
     <button class="skip" id="home">${esc(t('close'))}</button></div>`,
   ()=>{ if(canShare) $('#sh').onclick=()=>navigator.share({files:[file]}).catch(()=>{}); $('#home').onclick=home; }));
 }
@@ -819,7 +842,7 @@ function openJar(){
     show(`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%">
       ${jarHTML(S.lights,{open:true})}<div class="eyebrow">${esc(title)}</div><p class="lead">${esc(instr)}</p>
       <div class="list">${items||`<div>${esc(t('jarEmpty'))}</div>`}</div></div>
-      <div class="actions"><button class="btn gold" id="card">${esc(C.tarjeta[0][L])} ✨</button><button class="skip" id="home">${esc(t('close'))}</button></div>`,
+      <div class="actions"><button class="btn gold" id="card">${esc(t('cardBtn'))}</button><button class="skip" id="home">${esc(t('close'))}</button></div>`,
     ()=>{ $('#card').onclick=cardScreen; $('#home').onclick=home; });
   });
 }

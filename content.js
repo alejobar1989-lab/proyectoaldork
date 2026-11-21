@@ -97,8 +97,8 @@ window.CONTENT={
    "en": "Now say it, looking into their eyes."
   },
   "look10": {
-   "es": "10 segundos. Solo mírense.",
-   "en": "10 seconds. Just look at each other."
+   "es": "Solo mírense.",
+   "en": "Just look at each other."
   },
   "hug": {
    "es": "¿Un abrazo? Solo si quieren.",
@@ -303,6 +303,66 @@ window.CONTENT={
   "youAre": {
    "es": "Eres",
    "en": "You are"
+  },
+  "lookGo": {
+   "es": "Mírense ✨",
+   "en": "Look at each other ✨"
+  },
+  "lookWait": {
+   "es": "Esperen a que las dos luces se encuentren.",
+   "en": "Wait for the two lights to meet."
+  },
+  "cardBtn": {
+   "es": "Nuestra tarjeta ✨",
+   "en": "Our card ✨"
+  },
+  "cardUs": {
+   "es": "Lo que nos notamos",
+   "en": "What We Noticed in Each Other"
+  },
+  "cardFrom": {
+   "es": "De {a} para {b}",
+   "en": "From {a} to {b}"
+  },
+  "cardGiven": {
+   "es": "Gracias de ida",
+   "en": "Thanks, given"
+  },
+  "cardReturned": {
+   "es": "Gracias de vuelta",
+   "en": "Thanks, returned"
+  },
+  "cardKeep1": {
+   "es": "Esto vimos hoy. Sigamos notándolo.",
+   "en": "This is what we saw today. Let's keep noticing."
+  },
+  "cardKeep2": {
+   "es": "Para volver a leerlo cuando haga falta.",
+   "en": "To read again whenever we need it."
+  },
+  "cardKeep3": {
+   "es": "Lo bueno se nota. Y se dice.",
+   "en": "The good stuff deserves to be noticed. And said out loud."
+  },
+  "namesQ": {
+   "es": "¿Quieren poner sus nombres?",
+   "en": "Want to add your names?"
+  },
+  "nameA": {
+   "es": "Quien empezó",
+   "en": "Who went first"
+  },
+  "nameB": {
+   "es": "Su pareja",
+   "en": "Their partner"
+  },
+  "makeCardBtn": {
+   "es": "Crear tarjeta",
+   "en": "Make our card"
+  },
+  "noNames": {
+   "es": "Sin nombres",
+   "en": "Skip names"
   }
  },
  "detective": [
