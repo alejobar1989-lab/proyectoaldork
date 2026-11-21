@@ -35,9 +35,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .top{display:flex;align-items:center;justify-content:space-between;height:48px;flex:none}
 .mini{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
 .mj{position:relative;width:46px;height:46px;flex:none;--mg:0}
+/* el tarrito: la luz va detrás del vidrio apagado; el vidrio se calienta (ámbar) a medida que se llena */
+.mj canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .mj img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
-  filter:drop-shadow(0 0 calc(3px + 14px*var(--mg)) rgba(255,185,85,calc(.18 + .75*var(--mg)))) brightness(calc(.82 + .3*var(--mg)))}
-.mj canvas{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;pointer-events:none}
+  filter:drop-shadow(0 0 calc(2px + 14px*var(--mg)) rgba(255,185,85,calc(.1 + .8*var(--mg)))) sepia(calc(.75*var(--mg))) saturate(calc(1 + 2.2*var(--mg))) brightness(calc(.95 + .3*var(--mg)))}
 .mini b{color:var(--gold);font-weight:700;font-size:15px}
 .tbtn{font-size:14px;min-height:44px;min-width:44px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted)}
 .tbtns{display:flex;gap:8px}
@@ -85,19 +86,19 @@ h2{font-family:var(--serif);font-weight:700;font-size:30px;line-height:1.15;marg
 .phone{font-size:70px;animation:swing 1.6s ease-in-out infinite}
 @keyframes swing{0%,100%{transform:translateX(-30px) rotate(-12deg)}50%{transform:translateX(30px) rotate(12deg)}}
 .jarbox{position:relative;width:min(70vw,280px,34vh);aspect-ratio:1;cursor:pointer;--glow:0;isolation:isolate}
-.jarbox .jc,.jarbox .jo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;
-  filter:drop-shadow(0 10px calc(30px + 40px*var(--glow)) rgba(255,170,70,calc(.25 + .45*var(--glow)))) brightness(calc(.92 + .22*var(--glow)));transition:filter 1.2s}
-.jarbox .jc{transform-origin:50% 92%}
-.jarbox .jo,.jarbox.isopen .jc{opacity:0}
-.jarbox.isopen .jo{opacity:1}
+/* capas: luz y luciérnagas de adentro (canvas.in) → vidrio apagado transparente (.jc/.jo) → el mismo vidrio
+   teñido de ámbar que aparece según la luz (.warm) → luciérnagas de afuera y chispas (canvas.out) → tapa */
+.jarbox .jc,.jarbox .jo,.jarbox .warm{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;pointer-events:none}
+.jarbox .jc,.jarbox .jo{filter:drop-shadow(0 8px calc(14px + 40px*var(--glow)) rgba(255,170,70,calc(.08 + .55*var(--glow))))}
+.jarbox .warm{z-index:3;mix-blend-mode:screen;filter:sepia(1) saturate(3.5) hue-rotate(-12deg) brightness(1.1);opacity:calc(.9*var(--glow))}
+.jarbox .jc,.jarbox .wc{transform-origin:50% 92%}
+.jarbox .jo,.jarbox .wo,.jarbox.isopen .jc,.jarbox.isopen .wc{display:none}
+.jarbox.isopen .jo,.jarbox.isopen .wo{display:block}
 .jarbox canvas{position:absolute;inset:-25%;width:150%;height:150%;pointer-events:none}
-.jarbox canvas.in{z-index:2;mix-blend-mode:screen}
+.jarbox canvas.in{z-index:1}
 .jarbox canvas.out{z-index:4}
-.jarbox .gl{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:3;pointer-events:none;mix-blend-mode:screen;filter:brightness(.9) contrast(2.4) saturate(.5);opacity:.3}
-.jarbox .glo,.jarbox.isopen .glc{opacity:0}
-.jarbox.isopen .glo{opacity:.3}
-.jarbox .lidw{position:absolute;left:29.19%;top:8.61%;width:41.39%;z-index:5;pointer-events:none}
-.jarbox .lid{display:block;width:100%;height:auto;opacity:0;transform-origin:50% 80%;-webkit-mask:linear-gradient(#000 0 47%,rgba(0,0,0,.7) 55%);mask:linear-gradient(#000 0 47%,rgba(0,0,0,.7) 55%);filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(calc(.92 + .2*var(--glow)))}
+.jarbox .lidw{position:absolute;left:29.11%;top:8.29%;width:41.55%;z-index:5;pointer-events:none}
+.jarbox .lid{display:block;width:100%;height:auto;opacity:0;transform-origin:50% 80%;-webkit-mask:linear-gradient(#000 0 52%,rgba(0,0,0,.75) 60%);mask:linear-gradient(#000 0 52%,rgba(0,0,0,.75) 60%);filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(calc(.88 + .25*var(--glow)))}
 .jarbox.isopen .lid{opacity:1}
 .lidw.float{animation:lidfloat 3.2s ease-in-out infinite}
 @keyframes lidfloat{50%{transform:translateY(-6%) rotate(-1.5deg)}}
@@ -108,7 +109,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:30px;line-height:1.15;marg
   background:repeating-conic-gradient(from 0deg,rgba(255,200,110,.13) 0deg 5deg,transparent 5deg 22deg);
   -webkit-mask:radial-gradient(closest-side,#000 20%,transparent 75%);mask:radial-gradient(closest-side,#000 20%,transparent 75%);animation:spin 60s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.jarbox.pop .jc{animation:jpop .5s ease}
+.jarbox.pop .jc,.jarbox.pop .wc{animation:jpop .5s ease}
 @keyframes jpop{40%{transform:scale(1.035)}}
 .icon[src*="gracias"],.step img[src*="gracias"]{filter:brightness(.82) saturate(.9) drop-shadow(0 8px 22px rgba(255,170,70,.18))}
 .card.flip{animation:flip .6s cubic-bezier(.2,.8,.25,1) both;transform-origin:50% 50%}
@@ -145,7 +146,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:30px;line-height:1.15;marg
 <body>
 <div id="app">
   <div class="top">
-    <div class="mini" id="mini"><div class="mj" id="mj"><img src="img/frasco.webp" alt=""><canvas id="mjc"></canvas></div><b id="count">0</b><span id="countLbl"></span></div>
+    <div class="mini" id="mini"><div class="mj" id="mj"><canvas id="mjc"></canvas><img src="img/frasco-apagado.webp" alt=""></div><b id="count">0</b><span id="countLbl"></span></div>
     <div class="tbtns"><button class="tbtn" id="snd" aria-label="sonido">🔈</button><button class="tbtn" id="lang"></button></div>
   </div>
   <div id="view"></div>
@@ -291,7 +292,7 @@ function mountJars(){
     const interval=target?Math.max(55,Math.min(5200,900+target*230)/maxN):999;
     /* tapa: tiembla, salta con un "pop", flota mientras entran las luces y vuelve a cerrar */
     const setOpen=o=>box.classList.toggle('isopen',o);
-    const jc=box.querySelector('.jc');
+    const jcs=[box.querySelector('.jc'),box.querySelector('.wc')], jc={animate:(k,o)=>{ jcs[1].animate(k,o); return jcs[0].animate(k,o); }};
     const openLid=cb=>{ lidState='opening';
       /* primero tiembla el frasco entero, con su tapa original; la tapa suelta aparece justo en el "pop" */
       jc.animate([{transform:'none'},{transform:'rotate(-2deg)'},{transform:'rotate(2deg)'},{transform:'rotate(-1.5deg) translateY(-1%)'},{transform:'rotate(1deg)'},{transform:'none'}],{duration:600,easing:'ease-in-out'}).onfinish=()=>{
@@ -432,8 +433,8 @@ function addLight(big, from, quiet){
 }
 function jarHTML(n,opts){ opts=opts||{};
   return `<div class="jarbox" data-n="${n}" ${opts.intro?'data-intro="1"':''} ${opts.counter?`data-counter="${opts.counter}"`:''} ${opts.open?'data-open="1"':''} ${opts.style?`style="${opts.style}"`:''}><div class="rays"></div><div class="halo"></div>
-    <img class="jc" src="img/frasco.webp" alt=""><img class="jo" src="img/frasco-abierto.webp" alt=""><canvas class="in"></canvas>
-    <img class="gl glc" src="img/frasco.webp" alt=""><img class="gl glo" src="img/frasco-abierto.webp" alt=""><canvas class="out"></canvas>
+    <canvas class="in"></canvas><img class="jc" src="img/frasco-apagado.webp" alt=""><img class="jo" src="img/frasco-abierto.webp" alt="">
+    <img class="warm wc" src="img/frasco-apagado.webp" alt=""><img class="warm wo" src="img/frasco-abierto.webp" alt=""><canvas class="out"></canvas>
     <div class="lidw"><img class="lid" src="img/tapa.webp" alt=""></div></div>`;
 }
 function passScreen(next, firstMsg){
